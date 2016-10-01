@@ -1,0 +1,647 @@
+" ==========================================
+" bundle: plugin management and configuration
+" ==========================================
+
+"------------------------------------------- begin of configs --------------------------------------------
+
+" ################### dependencies #####################
+" package dependence:  ctags, ag(he_silver_searcher)
+" python dependence:   pep8, pyflake
+
+" close compatible mode
+" be iMproved, required!!!
+set nocompatible
+" required !!!
+filetype off
+
+" ################### configure vendle ###################
+
+" set the runtime path to include vundel and initialize
+set rtp+=~/.vim/bundle/vundle/
+call vundle#rc()
+" alternatively, pass a path where vundle should install plugins
+" call vundle#begin('~/some/path/here')
+
+" ################### plugin management ###################
+" utilize Vundle to manage plugins
+" vim plugin bundle control, command model
+"     :BundleInstall	- install
+"     :BundleInstall!   - update
+"     :BundleClean      - remove plugin not in list,
+"							append '!' to auto-approved remove
+"     :BundleList		-list configured pluguins
+"     :BundleSearch foo	- search for foo: append '!' to refresh local cache
+"     :BundleUpdate
+
+" let vundle manage vundle, required!!!
+Bundle 'gmarik/vundle'
+
+" ################### basic configurations ######################
+
+" syntax check
+Bundle 'scrooloose/syntastic'
+let g:syntastic_error_symbol='>>'
+let g:syntastic_warning_symbol='>'
+let g:syntastic_check_on_open=1
+let g:syntastic_check_on_wq=0
+let g:syntastic_enable_highlighting=1
+
+" light weight
+" let g:syntastic_python_checkers=['pyflakes'] " enable pyflakes
+
+" medium weight
+" error code: http://pep8.readthedocs.org/en/latest/intro.html#error-codes
+let g:syntastic_python_checkers=['pyflakes', 'pep8'] " enalble pyflakes, which is faster than pylint
+let g:syntastic_python_pep8_args='--ignore=E501,E225,E124,E712'
+
+" heavy weight
+" powerful enough to tailor personal configuration
+" pylint codes: http://pylint-messages.wikidot.com/all-codes
+" let g:syntastic_python_checkers=['pyflakes', 'pylint'] " enable pyflakes, which is faster than pylint
+" let g:syntastic_python_checkers=['pylint'] " enable pyflakes, which is faster than pylint
+" let g:syntastic_python_pylint_args='--disable=C0111,R0903,C0301'
+
+"let g:syntastic_javascript_checkers = ['jsl', 'jshint']
+"let g:syntastic_html_checkers=['tidy', 'jshint']
+
+" change the highlight background color for the theme
+highlight SyntasticErrorSign guifg=white guibg=black
+
+" to see error location list
+let g:syntastic_always_populate_loc_list = 0
+let g:syntastic_auto_loc_list = 0
+let g:syntastic_loc_list_height = 5
+
+function! ToggleErrors()
+    let old_last_winnr = winnr('$')
+    lclose
+    if old_last_winnr == winnr('$')
+        " Nothing was closed, open syntastic error location panel
+        Errors
+    endif
+endfunction
+nnoremap <Leader>s :call ToggleErrors()<cr>
+nnoremap <Leader>sn :lnext<cr>
+nnoremap <Leader>sp :lprevious<cr>
+
+
+" *****  YouCompleteMe start *****
+" YouCompleteMe is an autocomplete plugin
+
+" YouCompleteMe should compiled by gcc-4.8 and g++-4.8
+" lower version of gcc and g++, such as gcc-4.4 and g++-4.4 will cause
+" YouComplete compile in a lower mode
+
+" restart YCM: YcmRestartServer
+
+Bundle 'Valloric/YouCompleteMe'
+" Youcompleteme default is 'tab'
+"let g:ycm_key_list_select_completion	=['<c-n>']
+"let g:ycm_key_list_select_completion	= ['<Down>']
+"let g:ycm_key_list_previous_completion	=['<c-p>']
+"let g:ycm_key_list_previous_completion = ['<Up>']
+"let g:ycm_key_list_select_completion	=[]
+"let g:ycm_key_list_previous_completion	=[]
+
+" enable autocomplete in comments
+let g:ycm_complete_in_comments = 1
+" enable autocomplete in string
+let g:ycm_complete_in_strings = 1
+" prompt 'UltiSnips'
+let g:ycm_use_ultisnips_completer = 1
+" collect comments and string to autocomplete
+let g:ycm_collect_identifiers_from_comments_and_strings = 1
+" collect identifiers from the file which generates by ctags
+let g:ycm_collect_identifiers_from_tags_files = 1
+" keyword autocomplete
+let g:ycm_seed_identifiers_with_syntax=1
+" open in horizontal split window when go to defination
+let g:ycm_goto_buffer_command = 'horizontal-split'
+" no need to comfirm to open ycm_extra_conf.py file when open vim
+"let g:ycm_confirm_extra_conf = 0
+
+" old version
+if !empty(glob("~/.vim/bundle/YouCompleteMe/cpp/ycm/.ycm_extra_conf.py"))
+    let g:ycm_global_ycm_extra_conf = "~/.vim/bundle/YouCompleteMe/cpp/ycm/.ycm_extra_conf.py"
+endif
+" new version
+if !empty(glob("~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py"))
+    let g:ycm_global_ycm_extra_conf = "~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py"
+endif
+
+" trigger completion for semantic at insert mode
+" however, I already map <c-Space> with sogou input
+"let g:ycm_key_invoke_completion = '<C-Space>'
+
+" NOTE:td, md, jd rd seems not work!!!
+" maybe I misunderstand what does youcompleteme want to do
+nnoremap <leader>td :YcmCompleter GetType<CR>
+nnoremap <leader>md :YcmCompleter GoToImplementation<CR>
+nnoremap <leader>jd :YcmCompleter GoToDefinition<CR>
+nnoremap <leader>rd :YcmCompleter GoToReferences<CR>
+
+" gd and id can work well
+" find the declaration of a function
+nnoremap <leader>gd :YcmCompleter GoToDeclaration<CR>
+nnoremap <leader>id :YcmCompleter GoToInclude<CR>
+" ***** YouCompleteMe end *****
+
+
+" quick insert code snipperts
+" track the engine
+Bundle 'SirVer/ultisnips'
+" Snippets are separated from the engine. Add this if you want them:
+Bundle 'honza/vim-snippets'
+" however, this conflicts with YouCompleteMe mapping
+let g:UltiSnipsExpandTrigger       = "<c-l>"
+let g:UltiSnipsJumpForwardTrigger  = "<c-j>"
+let g:UltiSnipsJumpBackwardTrigger = "<c-k>"
+
+" open the snippets file in a vertical window
+let g:UltiSnipsEditSplit = "vertical"
+let g:UltiSnipsSnippetDirectories  = ['UltiSnips']
+
+" define the directory to store code snippets
+" employ default setting will cause conflict
+let g:UltiSnipsSnippetsDir = '~/.vim/UltiSnips'
+
+" open the filetype to edit
+map <leader>us :UltiSnipsEdit<CR>
+
+" ctrl+j/k to choose
+func! g:JInYCM()
+    if pumvisible()
+        return "\<C-n>"
+    else
+        return "\<c-j>"
+    endif
+endfunction
+
+func! g:KInYCM()
+    if pumvisible()
+        return "\<C-p>"
+    else
+        return "\<c-k>"
+    endif
+endfunction
+inoremap <c-j> <c-r>=g:JInYCM()<cr>
+au BufEnter,BufRead * exec "inoremap <silent> " . g:UltiSnipsJumpBackwordTrigger . " <C-R>=g:KInYCM()<cr>"
+let g:UltiSnipsJumpBackwordTrigger = "<c-k>"
+
+
+" highlight c++ functions and std
+Bundle 'octol/vim-cpp-enhanced-highlight'
+let g:cpp_class_scope_highlight = 1
+let g:cpp_experimental_template_highlight = 1
+
+" autocomplete single quote and double quote
+Bundle 'Raimondi/delimitMate'
+
+"" for python docstring " optimize input
+au FileType python let b:delimitMate_nesting_quotes = ['"']
+" close autocomplete for some types file
+"au FileType mail let b:delimitMate_autoclose = 0
+
+
+" autocomplete for the tags of html/xml
+Bundle 'docunext/closetag.vim'
+let g:closetag_html_style=1
+
+" ################### quick coding ###################
+" quick comment
+Bundle 'scrooloose/nerdcommenter'
+" add spaces after comment delimiters by default
+let g:NERDSpaceDelims=1
+" use compact syntax for prettified multi-line comments
+" let g:NERDCompactSexyComs = 1
+" " align line-wise comment delimiters flush left instead of following code
+" " indentation
+" let g:NERDDefaultAlign = 'left'
+" " add your won custom formats or override the defaults
+" let g:NERDCustomDelimiters = { 'c':{ 'left': '/**','right': '*/' } }
+
+
+" provide mappings to easily delete, change and add such surroundings in pairs
+Bundle 'tpope/vim-surround'
+" for repeat -> enhance surround.vim, . to repeat command
+Bundle 'tpope/vim-repeat'
+
+" delete the space at the end of a line [, + <Space>]
+Bundle 'bronson/vim-trailing-whitespace'
+map <leader><space> :FixWhitespace<cr>
+
+" quick align
+Bundle 'junegunn/vim-easy-align'
+vmap <Leader>a <Plug>(EasyAlign)
+nmap <Leader>a <Plug>(EasyAlign)
+if !exists('g:easy_align_delimiters')
+  let g:easy_align_delimiters = {}
+endif
+let g:easy_align_delimiters['#'] = { 'pattern': '#', 'ignore_groups': ['String'] }
+
+" ################### quick move ###################
+
+" ***** easy motion start *****
+" high efficiency to move [,, + w/fx]
+
+" <leader><leader>w: trigger the word motion w
+" <leader><leader>f{char}: search {char} downwards from current cursor
+" <leader><leader>s{char}: search {char} from entire screen
+Bundle 'easymotion/vim-easymotion'
+let g:EasyMotion_smartcase = 1
+
+" keep cursor column when JK motion
+let g:EasyMotion_startofline = 0
+
+map <Leader><leader>h <Plug>(easymotion-linebackward)
+map <Leader><Leader>j <Plug>(easymotion-j)
+map <Leader><Leader>k <Plug>(easymotion-k)
+map <Leader><leader>l <Plug>(easymotion-lineforward)
+
+" two-characters search motion
+" search {char}{char} from entire screen
+" map s <Plug>(easymotion-s2)
+" overwin: instant show shortcut key for user to navigate
+map s <Plug>(easymotion-overwin-f2)
+" search {char}{char} downwards from current cursor
+map t <Plug>(easymotion-t2)
+
+" n-characters search motion
+map / <Plug>(easymotion-sn)
+omap / <plug>(easymotion-tn)
+
+" repeat last operation
+map <Leader><leader>. <Plug>(easymotion-repeat)
+" ***** easy motion end *****
+
+" ***** cscope.vim settings *****
+Bundle 'vim-scripts/matchit.zip'
+
+Bundle 'vim-scripts/cscope.vim'
+"let g:cscope_preload_path = "/usr/include/c++"
+nnoremap <leader>fa :call cscope#findInteractive(expand('<cword>'))<cr>
+nnoremap <leader>l :call ToggleLocationList()<cr>
+" s: Find this C symbol
+nnoremap  <leader>fs :call cscope#find('s', expand('<cword>'))<CR>
+" g: Find this definition
+nnoremap  <leader>fg :call cscope#find('g', expand('<cword>'))<CR>
+" d: Find functions called by this function
+nnoremap  <leader>fd :call cscope#find('d', expand('<cword>'))<CR>
+" c: Find functions calling this function
+nnoremap  <leader>fc :call cscope#find('c', expand('<cword>'))<CR>
+" t: Find this text string
+nnoremap  <leader>ft :call cscope#find('t', expand('<cword>'))<CR>
+" e: Find this egrep pattern
+nnoremap  <leader>fe :call cscope#find('e', expand('<cword>'))<CR>
+" f: Find this file
+nnoremap  <leader>ff :call cscope#find('f', expand('<cword>'))<CR>
+" i: Find files #including this file
+nnoremap  <leader>fi :call cscope#find('i', expand('<cword>'))<CR>
+
+" show marks: to mark and jump
+" m[a-zA-Z] add mark
+" '[a-zA-Z] go to mark
+" m<Space>  del all marks
+Bundle "kshenoy/vim-signature"
+
+" ################### text edit ###################
+
+" easily create own text objects
+Bundle 'kana/vim-textobj-user.git'
+" text objects for the current line: l   dal yal cil
+Bundle 'kana/vim-textobj-line'
+" provide text objects to select the entire content of a buffer  : e   dae yae cie
+" by default ae and ie
+Bundle 'kana/vim-textobj-entire.git'
+" text objects for indented blocks of lines   : i   dai yai cii
+Bundle 'kana/vim-textobj-indent.git'
+
+" ################### quick choose ###################
+" choose a block
+Bundle 'terryma/vim-expand-region'
+" map + <Plug>(expand_region_expand)
+" map _ <Plug>(expand_region_shrink)
+vmap v <Plug>(expand_region_expand)
+vmap V <Plug>(expand_region_shrink)
+
+" edit together for multiple selection by cursor
+" it is great for quick refactoring
+Bundle 'terryma/vim-multiple-cursors'
+let g:multi_cursor_use_default_mapping=0
+" Default mapping
+let g:multi_cursor_next_key='<C-m>'
+let g:multi_cursor_prev_key='<C-p>'
+let g:multi_cursor_skip_key='<C-x>'
+let g:multi_cursor_quit_key='<Esc>'
+
+" ################### related function ###################
+
+" file search
+" change to https://github.com/ctrlpvim/ctrlp.vim
+Bundle 'ctrlpvim/ctrlp.vim'
+map <leader>f :CtrlPMRU<CR>
+let g:ctrlp_map = '<c-p>'
+let g:ctrlp_cmd = 'CtrlP'
+let g:ctrlp_working_path_mode = 'ra'
+" c: the directory of the current file
+" a: the directory of the currentfile, unless it is a subdirecotryof the cwd
+" r: the nearest ancestor of the current file that contains one of these directories or files: .git .hg .svn .bzr _darcs
+" w: modifier to r: start search from the cwd instead of the current file`s" directory
+" 0 or ' ': disable this features
+
+let g:ctrlp_working_path_mode=0
+let g:ctrlp_match_window_bottom=1
+let g:ctrlp_max_height=15
+let g:ctrlp_match_window_reversed=0
+let g:ctrlp_mruf_max=500
+let g:ctrlp_follow_symlinks=1
+
+let g:ctrlp_custom_ignore = {
+    \ 'dir':  '\v[\/]\.(git|hg|svn|rvm)$',
+    \ 'file': '\v\.(exe|so|dll|zip|tar|tar.gz|pyc)$',
+    \ }
+" if executable('ag')
+  " " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
+  " let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+  " " ag is fast enough that CtrlP doesn't need to cache
+  " let g:ctrlp_use_caching = 0
+" endif
+
+
+" ctrlp: effective navigation
+Bundle 'tacahiroy/ctrlp-funky'
+nnoremap <Leader>fu :CtrlPFunky<CR>
+" narrow the list down with a word under cursor
+nnoremap <Leader>fU :execute 'CtrlPFunky ' . expand('<cword>')<CR>
+let g:ctrlp_funky_syntax_highlight = 1
+let g:ctrlp_funky_matchtype = 'path'
+let g:ctrlp_extensions = ['funky']
+
+" a search plugin
+Bundle "dyng/ctrlsf.vim"
+" In CtrlSF window:
+" enter/o, open
+" t   open in tab(recommendation)
+" T - Lkie t but focus CtrlSF window instead of opened new tab.
+" q - Quit CtrlSF window.
+"nmap \ <Plug>CtrlSFCwordPath<CR>
+" let g:ctrlsf_position = 'below'
+" let g:ctrlsf_winsize = '30%'
+let g:ctrlsf_auto_close = 0
+let g:ctrlsf_confirm_save = 0
+" Note: cannot use <CR> or <C-m> for open
+" Use : <sapce> or <tab>
+let g:ctrlsf_mapping = {
+    \ "open"  : "<Space>",
+    \ "openb" : "O",
+    \ "tab"   : "t",
+    \ "tabb"  : "T",
+    \ "prevw" : "p",
+    \ "quit"  : "q",
+    \ "next"  : "<C-J>",
+    \ "prev"  : "<C-K>",
+    \ "pquit" : "q",
+    \ }
+
+" :Gdiff  :Gstatus :Gvsplit
+" version control
+Bundle 'tpope/vim-fugitive'
+nnoremap <leader>ge :Gdiff<CR>
+" not ready to open
+nnoremap <leader>gb :Gblame<CR>
+"nnoremap <leader>gs :Gstatus<CR>
+nnoremap <leader>gd :Gdiff<CR>  conflict
+nnoremap <leader>gl :Glog<CR>
+nnoremap <leader>gc :Gcommit<CR>
+nnoremap <leader>gp :Git push<CR>
+nnoremap <leader>gv :Gvsplit
+
+" show modified lines in real time, which is similiar with git diff
+Bundle 'airblade/vim-gitgutter'
+let g:gitgutter_map_keys = 0
+let g:gitgutter_enabled =  0
+let g:gitgutter_highlight_lines = 1
+nnoremap <leader>ht :GitGutterToggle<CR>
+
+" edit history, undo back to some history status
+Bundle 'sjl/gundo.vim'
+noremap <leader>h :GundoToggle<CR>
+
+" ################### incremental display ###################
+" incremental show for status line
+
+"Bundle 'bling/vim-airline'
+Bundle 'vim-airline/vim-airline'
+if !exists('g:airline_symbols')
+    let g:airline_symbols = {}
+endif
+let g:airline_left_sep = '▶'
+let g:airline_left_alt_sep = '❯'
+let g:airline_right_sep = '◀'
+let g:airline_right_alt_sep = '❮'
+let g:airline_symbols.linenr = '¶'
+let g:airline_symbols.branch = '⎇'
+
+" tabline enable or disable
+" display the buffers at top
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#show_buffers = 1
+let g:airline#extensions#tabline#show_splits = 1
+let g:airline#extensions#tabline#show_tabs = 0
+let g:airline#extensions#tabline#show_tab_nr = 0
+let g:airline#extensions#tabline#show_tab_type = 0
+let g:airline#extensions#tabline#show_close_button = 1
+
+let g:airline#extensions#tabline#left_sep = ''
+"let g:airline#extensions#tabline#left_alt_sep = ''
+"let g:airline#extensions#tabline#right_sep = ''
+
+
+
+" incremental display for parentheses
+Bundle 'kien/rainbow_parentheses.vim'
+
+" \ ['black',       'SeaGreen3'],
+let g:rbpt_colorpairs = [
+    \ ['brown',       'RoyalBlue3'],
+    \ ['Darkblue',    'SeaGreen3'],
+    \ ['darkgray',    'DarkOrchid3'],
+    \ ['darkgreen',   'firebrick3'],
+    \ ['darkcyan',    'RoyalBlue3'],
+    \ ['darkred',     'SeaGreen3'],
+    \ ['darkmagenta', 'DarkOrchid3'],
+    \ ['brown',       'firebrick3'],
+    \ ['gray',        'RoyalBlue3'],
+    \ ['darkmagenta', 'DarkOrchid3'],
+    \ ['Darkblue',    'firebrick3'],
+    \ ['darkgreen',   'RoyalBlue3'],
+    \ ['darkcyan',    'SeaGreen3'],
+    \ ['darkred',     'DarkOrchid3'],
+    \ ['red',         'firebrick3'],
+    \ ]
+
+let g:rbpt_max = 16
+let g:rbpt_loadcmd_toggle = 0
+au VimEnter * RainbowParenthesesToggle
+au Syntax * RainbowParenthesesLoadRound
+au Syntax * RainbowParenthesesLoadSquare
+au Syntax * RainbowParenthesesLoadBraces
+
+
+" ################### incremental display for theme ###################"
+" solarized
+Bundle 'altercation/vim-colors-solarized'
+let g:solarized_termtrans=1
+let g:solarized_contrast="normal"
+let g:solarized_visibility="normal"
+let g:solarized_termcolors=256
+
+" molokai
+Bundle 'tomasr/molokai'
+" original background color of  monokai
+let g:molokai_original = 1
+"let g:rehash256=1
+
+" tomorrow
+Bundle 'chriskempson/vim-tomorrow-theme'
+
+" parentheses auto completation
+Bundle 'jiangmiao/auto-pairs'
+
+" ################### nerdtree ###################
+Bundle 'scrooloose/nerdtree'
+map <leader>n :NERDTreeToggle<CR>
+let g:NERDTreeWinPos = "right"
+let NERDTreeHighlightCursorline=1
+let NERDTreeIgnore=[ '\.pyc$', '\.pyo$', '\.obj$', '\.o$', '\.so$', '\.egg$', '^\.git$', '^\.svn$', '^\.hg$' ]
+
+"close vim if the only window left open is a NERDTree
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | end
+
+" open a file in horizontal or vertical
+let g:NERDTreeMapOpenSplit = 's'
+let g:NERDTreeMapOpenVSplit = 'v'
+
+
+Bundle 'jistr/vim-nerdtree-tabs'
+map <Leader>n <plug>NERDTreeTabsToggle<CR>
+" close synchronization
+let g:nerdtree_tabs_synchronize_view=0
+let g:nerdtree_tabs_synchronize_focus=0
+" nerdtree open automatically
+"let g:nerdtree_tabs_open_on_console_startup=1
+
+" Vim Workspace Controller
+Bundle "szw/vim-ctrlspace"
+let g:airline_exclude_preview = 1
+hi CtrlSpaceSelected guifg=#586e75 guibg=#eee8d5 guisp=#839496 gui=reverse,bold ctermfg=10 ctermbg=7 cterm=reverse,bold
+hi CtrlSpaceNormal   guifg=#839496 guibg=#021B25 guisp=#839496 gui=NONE ctermfg=12 ctermbg=0 cterm=NONE
+hi CtrlSpaceSearch   guifg=#cb4b16 guibg=NONE gui=bold ctermfg=9 ctermbg=NONE term=bold cterm=bold
+hi CtrlSpaceStatus   guifg=#839496 guibg=#002b36 gui=reverse term=reverse cterm=reverse ctermfg=12 ctermbg=8
+
+
+" show the graph of class and member and member function of current file
+Bundle 'vim-scripts/taglist.vim'
+let Tlist_Show_One_File=1
+let Tlist_Exit_OnlyWindow=1
+"let Tlist_Auto_Open=1
+let Tlist_WinWidth=40
+" open taglist
+nmap <leader>t :Tlist<CR>
+
+" ***** quickrun start *****
+Bundle 'thinca/vim-quickrun'
+let g:quickrun_config = {
+\   "_" : {
+\       "outputter" : "message",
+\   },
+\}
+let g:quickrun_no_default_key_mappings = 1
+nmap <Leader>r <Plug>(quickrun)
+map <F10> :QuickRun<CR>
+" ***** quickrun end *****
+
+
+" ###### Python #########
+" python fly check
+Bundle 'kevinw/pyflakes-vim'
+let g:pyflakes_use_quickfix = 0
+
+" for python.vim syntax highlight
+Bundle 'hdima/python-syntax'
+let python_highlight_all = 1
+
+" ###### Golang #########
+" 1.install golang and install gocode 'go get github.com/nsf/gocode'
+" 2.make sure gocode in your path: `which gocode` (add $GOPATH/bin to you $PATH)
+Bundle 'Blackrush/vim-gocode'
+" Bundle 'fatih/vim-go.git'
+
+" ###### Ruby #########
+" Bundle 'vim-ruby/vim-ruby'
+" Bundle 'nelstrom/vim-textobj-rubyblock'
+
+" there is a bug for current configuration
+" conflict with current configurations
+" do no topen
+" Bundle 'tpope/vim-endwise'
+" Bundle 'tpope/vim-rails'
+
+
+" ###### Markdown #########
+Bundle 'plasticboy/vim-markdown'
+let g:vim_markdown_folding_disabled=1
+
+" https://github.com/suan/vim-instant-markdown
+" npm -g install instant-markdown-d
+" Bundle 'suan/vim-instant-markdown'
+" let g:instant_markdown_slow = 1
+" let g:instant_markdown_autostart = 0
+" map <F12> :InstantMarkdownPreview<CR>
+
+" ###### HTML/JS/JQUERY/CSS #########
+
+" for javascript
+Bundle 'jelera/vim-javascript-syntax'
+Bundle "pangloss/vim-javascript"
+let g:html_indent_inctags = "html,body,head,tbody"
+let g:html_indent_script1 = "inc"
+let g:html_indent_style1 = "inc"
+
+" nodejs&npm is required for javascript auto completion
+" see https://github.com/marijnh/tern_for_vim
+" Bundle 'marijnh/tern_for_vim'
+
+" for jquery
+Bundle 'nono/jquery.vim'
+
+" ###### emmet HTML complete #########
+" Bundle "mattn/emmet-vim"
+
+" ###### vim.less : less update automatically#########
+" Bundle 'groenewege/vim-less'
+" autocmd BufWritePost *.less :!lessc % > %:p:r.css
+
+" ###### Jinja2 #########
+Bundle 'Glench/Vim-Jinja2-Syntax'
+
+" ####### temp #######
+" python code format
+autocmd FileType python nnoremap <leader>y :0,$!yapf<Cr>
+" Bundle 'mindriot101/vim-yapf'
+" scriptencoding utf-8
+" let g:yapf_style = "google"
+" let g:yapf_style = "pep8"
+" setenv PYTHONIOENCODING UTF-8
+" nnoremap <leader>y :call Yapf()<cr>
+
+" Bundle 'amoffat/snake'
+" I do not want to change much for default registers, just default behavior
+" Bundle 'svermeulen/vim-easyclip'
+
+Bundle 'lervag/vimtex'
+
+" required!!!
+" all of the plugins must be added before the following line
+"call vundle#end()
+"------------------------------------------- end of configs --------------------------------------------
